@@ -41,6 +41,7 @@ class LoginView(tk.Tk):
         self._password_visible = False # Estado para mostrar/ocultar contraseña
         self._configurar_estilos() # Configuración de estilos visuales
         self._crear_interfaz() # Construir la interfaz
+        self._crear_menu() # Crear el menú de la ventana
 
     # funcion para asignar el controlador a la vista
     def set_controller(self, controller):
@@ -212,6 +213,26 @@ class LoginView(tk.Tk):
             fg="#64748B"
         )
         lbl_footer.pack()
+
+    def _crear_menu(self):
+        self.menu_principal = tk.Menu(self)
+
+        menu_help = tk.Menu(
+            self.menu_principal,
+            tearoff=0
+        )
+
+        menu_help.add_command(
+            label="About",
+            command=lambda: self.controller.mostrar_about()
+        )
+
+        self.menu_principal.add_cascade(
+            label="Help",
+            menu=menu_help
+        )
+
+        self.config(menu=self.menu_principal)
 
     #funcion para alternar la visibilidad de la contraseña
     def _toggle_password_visibility(self):
