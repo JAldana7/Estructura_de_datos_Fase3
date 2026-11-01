@@ -1,4 +1,4 @@
-#importacion importantes
+#importacion necesarias
 import sys, os
 import tkinter as tk
 import ctypes
@@ -19,24 +19,18 @@ class LoginView(tk.Tk):
         except:
             pass
         super().__init__() #hereda comportamientos
-
         self.controller = controller # Asigna el controlador
 
         # Configuración de la ventana principal
         self.title("Login - Compensándote")
+        self.ancho = 600
+        self.alto = 580
+        centrar_ventana(self, self.ancho, self.alto) # Configuración de tamaño y posición
+        self.configure(bg="#F4F6F8")
+        self.resizable(False, False)
 
         # Obtener la carpeta principal del proyecto
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        ruta_icono = os.path.join(BASE_DIR, "img", "ico.png")
-        #self.icono = tk.PhotoImage(file=ruta_icono)
-        #self.iconphoto(False, self.icono)
-
-        # Configuración de tamaño y posición
-        self.ancho = 600
-        self.alto = 580
-        centrar_ventana(self, self.ancho, self.alto)
-        self.configure(bg="#F4F6F8")
-        self.resizable(False, False)
 
         self._password_visible = False # Estado para mostrar/ocultar contraseña
         self._configurar_estilos() # Configuración de estilos visuales
@@ -46,7 +40,7 @@ class LoginView(tk.Tk):
     # funcion para asignar el controlador a la vista
     def set_controller(self, controller):
         self.controller = controller # Asigna el controlador a la vista
-        
+
         # Conectar el botón de ingresar con la función procesar_login del controlador
         self.btn_ingresar.config(command=self.controller.procesar_login)
         # Conectar la tecla Enter en la caja de texto
@@ -238,25 +232,28 @@ class LoginView(tk.Tk):
         )
         lbl_footer.pack()
 
+    #funcion para crear el menu de la ventana
     def _crear_menu(self):
-        self.menu_principal = tk.Menu(self)
+        self.menu_principal = tk.Menu(self) # Crear el menú principal
 
+        # Crear el submenú "Help"
         menu_help = tk.Menu(
             self.menu_principal,
             tearoff=0
         )
 
+        # Agregar opción "About" al submenú "Help"
         menu_help.add_command(
             label="About",
             command=lambda: self.controller.mostrar_about()
         )
-
+        
         self.menu_principal.add_cascade(
             label="Help",
             menu=menu_help
         )
 
-        self.config(menu=self.menu_principal)
+        self.config(menu=self.menu_principal) # Asignar el menú principal a la ventana
 
     #funcion para alternar la visibilidad de la contraseña
     def _toggle_password_visibility(self):

@@ -1,6 +1,6 @@
 """
 Autor: Johan Aldana
-Fecha: 24/09/2026
+Fecha: 30/10/2026
 Fuente: Autoria propia
 """
 from views.login_view import LoginView

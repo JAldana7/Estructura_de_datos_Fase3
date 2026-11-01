@@ -1,24 +1,25 @@
+# importaciones necesarias
 import tkinter as tk
 from tkinter import ttk
+import ctypes
 from typing import Callable, Dict, List
 from utils.helpers import centrar_ventana
 from models.enums import IDType, EmploymentType, DesiredService, StructureType
 
+# clase principal de la vista
 class MainView(tk.Frame):
-    """
-    Modern UI implementation for Compensándote Affiliation Control.
-    Matches the custom corporate layout with cyan header banners and rounded panel designs.
-    """
-
     def __init__(self, parent: tk.Tk):
-        super().__init__(parent)
-        self.parent = parent
-        self.parent.title("Compensándote — Affiliation Control")
-        centrar_ventana(self.parent, 1150, 700)
-        #self.parent.geometry("1150x700")
+        try:
+            ctypes.windll.shcore.SetProcessDpiAwareness(1) # Mejorar la resolución
+        except:
+            pass
+        super().__init__(parent) # hereda comportamientos
+        self.parent = parent # referencia a la ventana principal
+        self.parent.title("Compensándote — Affiliation Control") 
+        centrar_ventana(self.parent, 1150, 700) # Configuración de tamaño y posición
         self.parent.resizable(True, True)
 
-        self.callbacks: Dict[str, Callable] = {}
+        self.callbacks: Dict[str, Callable] = {} # diccionario para almacenar las funciones de callback
 
         # UI Variables
         self.var_id_type = tk.StringVar(value=IDType.CC.value)
@@ -29,51 +30,51 @@ class MainView(tk.Frame):
         self.var_desired_service = tk.StringVar(value=DesiredService.UNEMPLOYMENT_SUBSIDY.value)
         self.var_affiliation_fee = tk.StringVar(value="$0.00")
         
-        # Date selector variables
-        self.var_day = tk.StringVar(value="31")
-        self.var_month = tk.StringVar(value="10")
+        # seleccion de la fecha de afiliacion
+        self.var_day = tk.StringVar(value="-")
+        self.var_month = tk.StringVar(value="-")
         self.var_year = tk.StringVar(value="2026")
 
-        # Structure selection & Report variables
+        # seleccion de la estructura de datos
         self.var_selected_structure = tk.StringVar(value=StructureType.STACK.value)
-        self.var_report_text = tk.StringVar(value="Total Affiliation Fees Sum: $0.00")
+        self.var_report_text = tk.StringVar(value="Total Affiliation Fees Sum: $0.00") # texto de afiliacion
 
+        # Configuración de estilos y construcción de la interfaz
         self._configure_modern_palette()
         self._create_menu_bar()
-
-        # ---> AGREGAR ESTA LÍNEA PARA EMPAQUETAR EL FRAME PRINCIPAL <---
         self.pack(fill=tk.BOTH, expand=True)
-
         self._build_ui()
 
+    # funcion para configurar la paleta de colores moderna
     def _configure_modern_palette(self) -> None:
-        """Sets corporate palette based on reference UI image."""
-        self.bg_window = "#F1F5F9"        # Soft slate grey background
-        self.bg_card = "#FFFFFF"          # White container cards
-        self.border_gray = "#CBD5E1"      # Border lines
-        self.fg_dark = "#1E293B"          # Text color
-        self.fg_label = "#334155"         # Field label text color
+        # Colores de la paleta moderna
+        self.bg_window = "#F1F5F9"        
+        self.bg_card = "#FFFFFF"          
+        self.border_gray = "#CBD5E1"      
+        self.fg_dark = "#1E293B"          
+        self.fg_label = "#334155"         
         
-        # Exact palette colors from mockup
-        self.cyan_header = "#00B4D8"       # Top header cyan banner
-        self.cyan_accent = "#00B4D8"       # Form title & highlights
-        self.bg_fee_box = "#E0F2FE"       # Light blue highlight box
+        # colores de acento
+        self.cyan_header = "#00B4D8"      
+        self.cyan_accent = "#00B4D8"      
+        self.bg_fee_box = "#E0F2FE"      
         
-        # Button Palette
-        self.btn_register = "#00B4D8"     # Bright Cyan
-        self.btn_clear = "#78869B"        # Slate Muted Blue
-        self.btn_report = "#00B67A"       # Emerald Mint Green
-        self.btn_delete = "#F97316"       # Vivid Orange
-        self.btn_exit = "#EF4444"         # Crimson Red
+        # paleta de colores para botones
+        self.btn_register = "#00B4D8"     
+        self.btn_clear = "#78869B"        
+        self.btn_report = "#00B67A"      
+        self.btn_delete = "#F97316"      
+        self.btn_exit = "#EF4444"         
 
+        # Configuración de la ventana principal
         self.parent.configure(bg=self.bg_window)
         self.configure(bg=self.bg_window)
 
-        # Style TTK widgets
+        # estilos para los widgets de la interfaz
         style = ttk.Style()
         style.theme_use("clam")
 
-        # Table styling (Light pastel headers matching image)
+        # estilo para la tabla (Treeview)
         style.configure(
             "Treeview",
             background="#FFFFFF",
@@ -92,6 +93,7 @@ class MainView(tk.Frame):
         )
         style.map("Treeview", background=[("selected", "#BAE6FD")], foreground=[("selected", "#0369A1")])
 
+    # funcion para crear la barra de menu
     def _create_menu_bar(self) -> None:
         menubar = tk.Menu(self.parent)
         about_menu = tk.Menu(menubar, tearoff=0)
@@ -99,15 +101,16 @@ class MainView(tk.Frame):
         menubar.add_cascade(label="About", menu=about_menu)
         self.parent.config(menu=menubar)
 
+    # funcion para construir la interfaz de usuario
     def _build_ui(self) -> None:
-        # Top Cyan Banner
+        # banner superior con fondo cian y texto blanco
         header_banner = tk.Frame(self, bg=self.cyan_header, height=50)
         header_banner.pack(fill=tk.X, side=tk.TOP)
 
         title_container = tk.Frame(header_banner, bg=self.cyan_header)
         title_container.pack(side=tk.LEFT, padx=15, pady=10)
 
-        # Building icon placeholder text & main title
+        # Etiqueta de título con el nombre de la aplicación
         tk.Label(
             title_container,
             text="🏢  Compensándote — Affiliation Control",
@@ -116,19 +119,20 @@ class MainView(tk.Frame):
             bg=self.cyan_header
         ).pack(side=tk.LEFT)
 
-        # Main Layout Body
+        # Etiqueta de pie de página con derechos reservados
         body_container = tk.Frame(self, bg=self.bg_window)
         body_container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
 
         self._build_left_form_card(body_container)
         self._build_right_grid_card(body_container)
 
+    # funcion para construir la tarjeta de formulario en la columna izquierda
     def _build_left_form_card(self, parent: tk.Widget) -> None:
-        """Builds left column matching the blue-header rounded card design."""
+        # Contenedor de la tarjeta de formulario
         form_wrapper = tk.Frame(parent, bg=self.bg_card, bd=1, relief=tk.SOLID)
         form_wrapper.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 15), ipadx=0, ipady=0)
 
-        # Card Cyan Header
+        # encabezado del formulario
         header_frame = tk.Frame(form_wrapper, bg=self.btn_register, height=40)
         header_frame.pack(fill=tk.X)
 
@@ -177,7 +181,7 @@ class MainView(tk.Frame):
             )
             rb.pack(side=tk.LEFT, padx=(0, 10))
 
-        # Desired Service
+        # servicio deseado (combobox)
         tk.Label(form_body, text="Desired Service:", fg=self.fg_label, bg=self.bg_card, anchor="w", font=("Segoe UI", 9)).pack(fill=tk.X, pady=(2, 2))
         cb_service = ttk.Combobox(form_body, textvariable=self.var_desired_service, values=[s.value for s in DesiredService], state="readonly")
         cb_service.pack(fill=tk.X, pady=(0, 8))
@@ -196,15 +200,15 @@ class MainView(tk.Frame):
         tk.Label(form_body, text="Affiliation Date (dd/mm/yyyy):", fg=self.fg_label, bg=self.bg_card, anchor="w", font=("Segoe UI", 9)).pack(fill=tk.X, pady=(2, 2))
         date_frame = tk.Frame(form_body, bg=self.bg_card)
         date_frame.pack(fill=tk.X, pady=(0, 4))
-
+        # Comboboxes for Day, Month, Year
         ttk.Combobox(date_frame, textvariable=self.var_day, values=[str(i) for i in range(1, 32)], width=3, state="readonly").pack(side=tk.LEFT, padx=1)
         tk.Label(date_frame, text="/", fg=self.fg_dark, bg=self.bg_card).pack(side=tk.LEFT)
         ttk.Combobox(date_frame, textvariable=self.var_month, values=[str(i) for i in range(1, 13)], width=3, state="readonly").pack(side=tk.LEFT, padx=1)
         tk.Label(date_frame, text="/", fg=self.fg_dark, bg=self.bg_card).pack(side=tk.LEFT)
         ttk.Combobox(date_frame, textvariable=self.var_year, values=[str(i) for i in range(2020, 2031)], width=5, state="readonly").pack(side=tk.LEFT, padx=1)
 
+    # funcion para construir la tarjeta de tabla en la columna derecha
     def _build_right_grid_card(self, parent: tk.Widget) -> None:
-        """Builds right display card with data structure dropdown, table, report, and modern action buttons."""
         display_frame = tk.Frame(parent, bg=self.bg_window)
         display_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
@@ -224,6 +228,7 @@ class MainView(tk.Frame):
         columns = ("id_type", "id_number", "full_name", "income", "employment", "service", "fee", "date")
         self.tree = ttk.Treeview(tree_frame, columns=columns, show="headings", selectmode="browse")
 
+        # Configuración de encabezados y columnas
         self.tree.heading("id_type", text="Type")
         self.tree.heading("id_number", text="ID Number")
         self.tree.heading("full_name", text="Full Name")
@@ -233,6 +238,7 @@ class MainView(tk.Frame):
         self.tree.heading("fee", text="Fee")
         self.tree.heading("date", text="Date")
 
+        # Configuración de ancho y alineación de columnas
         self.tree.column("id_type", width=55, anchor="center")
         self.tree.column("id_number", width=95, anchor="center")
         self.tree.column("full_name", width=140, anchor="w")
@@ -241,10 +247,11 @@ class MainView(tk.Frame):
         self.tree.column("service", width=130, anchor="w")
         self.tree.column("fee", width=85, anchor="e")
         self.tree.column("date", width=80, anchor="center")
-
+        # Scrollbar for Treeview
         scrollbar = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscroll=scrollbar.set)
-        
+
+        # Pack the Treeview and Scrollbar
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
@@ -252,6 +259,7 @@ class MainView(tk.Frame):
         report_frame = tk.Frame(display_frame, bg=self.bg_window)
         report_frame.pack(fill=tk.X, pady=(0, 12))
 
+        # Etiqueta y entrada de texto para mostrar el reporte
         tk.Label(report_frame, text="Report:", fg=self.fg_dark, bg=self.bg_window, font=("Segoe UI", 10, "bold")).pack(side=tk.LEFT, padx=(0, 10))
         entry_report = tk.Entry(
             report_frame, textvariable=self.var_report_text, state="readonly", 
@@ -264,25 +272,30 @@ class MainView(tk.Frame):
         btn_frame = tk.Frame(display_frame, bg=self.bg_window)
         btn_frame.pack(fill=tk.X)
 
+        # conjunto de botones con iconos y texto para realizar acciones
         tk.Button(btn_frame, text="👤+ Register", bg=self.btn_register, fg="white", font=("Segoe UI", 9, "bold"), bd=0, relief=tk.FLAT, command=lambda: self._trigger_callback("on_register")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=3, ipady=5)
         tk.Button(btn_frame, text="✏️ Clear", bg=self.btn_clear, fg="white", font=("Segoe UI", 9, "bold"), bd=0, relief=tk.FLAT, command=lambda: self._trigger_callback("on_clear")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=3, ipady=5)
         tk.Button(btn_frame, text="📑 Report", bg=self.btn_report, fg="white", font=("Segoe UI", 9, "bold"), bd=0, relief=tk.FLAT, command=lambda: self._trigger_callback("on_report")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=3, ipady=5)
         tk.Button(btn_frame, text="🗑️ Delete", bg=self.btn_delete, fg="white", font=("Segoe UI", 9, "bold"), bd=0, relief=tk.FLAT, command=lambda: self._trigger_callback("on_delete")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=3, ipady=5)
         tk.Button(btn_frame, text="🚪 Exit", bg=self.btn_exit, fg="white", font=("Segoe UI", 9, "bold"), bd=0, relief=tk.FLAT, command=lambda: self._trigger_callback("on_exit")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=3, ipady=5)
 
+    # funcion para establecer las funciones de callback del controlador
     def set_controller_callbacks(self, callbacks: Dict[str, Callable]) -> None:
         self.callbacks = callbacks
 
+    # funcion para disparar la función de callback correspondiente a una acción
     def _trigger_callback(self, key: str) -> None:
         if key in self.callbacks:
             self.callbacks[key]()
 
+    # funcion para actualizar los datos en la tabla (Treeview)
     def update_treeview(self, data: List[tuple]) -> None:
         for item in self.tree.get_children():
             self.tree.delete(item)
         for row in data:
             self.tree.insert("", tk.END, values=row)
 
+    # funcion para actualizar el texto del reporte
     def clear_inputs(self) -> None:
         self.var_id_number.set("")
         self.var_full_name.set("")

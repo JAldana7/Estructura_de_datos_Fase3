@@ -17,12 +17,12 @@ class LoginController:
         password_input = self.view.txt_password.get()  # Obtener la contraseña ingresada
 
         if not password_input:
-            messagebox.showwarning("Advertencia", "Por favor, ingrese su contraseña.")
+            messagebox.showwarning("Warning", "Please enter your password.")
             return
 
         # Validar credenciales con el modelo
         if self.login_model.validate_password(password_input):
-            messagebox.showinfo("Acceso Exitoso", "¡Bienvenido al sistema Compensándote!")
+            messagebox.showinfo("Success", "Welcome to the Compensándote system!")
             
             self.view.destroy() #cerrar la ventana de Login actual
             
@@ -31,7 +31,7 @@ class LoginController:
             controller_registro = MainController(app_registro)  # Asocia el controlador a la vista
             main_root.mainloop()
         else:
-            messagebox.showerror("Acceso Denegado", "Contraseña incorrecta. Intente nuevamente.")
+            messagebox.showerror("Access Denied", "Incorrect password. Please try again.")
             self.view.txt_password.delete(0, 'end')  # Limpiar el campo de contraseña
 
     def mostrar_about(self):

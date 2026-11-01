@@ -1,104 +1,99 @@
+# importaciones necesarias para la definición de las estructuras de datos
 from abc import ABC, abstractmethod
 from collections import deque
 from typing import List, Optional
 from models.affiliate import Affiliate
 
+# clase abstracta base para las estructuras de datos
 class BaseStructure(ABC):
-    """Abstract Base Class (Liskov Substitution & Interface Segregation Principles)"""
-    
     @abstractmethod
-    def add(self, affiliate: Affiliate) -> None:
+    def add(self, affiliate: Affiliate) -> None: # agrega un afiliado a la estructura de datos
         pass
 
     @abstractmethod
-    def remove(self, id_number: Optional[str] = None) -> Optional[Affiliate]:
+    def remove(self, id_number: Optional[str] = None) -> Optional[Affiliate]: # elimina un afiliado de la estructura de datos
         pass
 
     @abstractmethod
-    def get_all(self) -> List[Affiliate]:
+    def get_all(self) -> List[Affiliate]: # devuelve todos los afiliados en la estructura de datos
         pass
 
     @abstractmethod
-    def get_report(self) -> str:
+    def get_report(self) -> str: # devuelve un reporte de la estructura de datos
         pass
 
     @abstractmethod
-    def is_empty(self) -> bool:
+    def is_empty(self) -> bool: # verifica si la estructura de datos está vacía
         pass
 
-
+# clase para la implementación de una pila (stack) de afiliados
 class AffiliateStack(BaseStructure):
-    """Stack implementation using Python list (LIFO)"""
-    
+    # implementación de una pila (stack) de afiliados
     def __init__(self):
         self._items: List[Affiliate] = []
 
-    def add(self, affiliate: Affiliate) -> None:
-        self._items.append(affiliate)  # Push
-
-    def remove(self, id_number: Optional[str] = None) -> Optional[Affiliate]:
+    def add(self, affiliate: Affiliate) -> None: # agrega un afiliado a la pila (stack) de afiliados
+        self._items.append(affiliate)  
+ 
+    def remove(self, id_number: Optional[str] = None) -> Optional[Affiliate]: # elimina un afiliado de la pila (stack) de afiliados
         if not self.is_empty():
-            return self._items.pop()  # Pop LIFO
+            return self._items.pop() 
         return None
 
-    def get_all(self) -> List[Affiliate]:
-        return list(reversed(self._items))  # Return top-first for visual display
+    def get_all(self) -> List[Affiliate]: # devuelve todos los afiliados en la pila (stack) de afiliados
+        return list(reversed(self._items))  
 
-    def is_empty(self) -> bool:
+    def is_empty(self) -> bool: # verifica si la pila (stack) de afiliados está vacía
         return len(self._items) == 0
 
     def get_report(self) -> str:
-        """Report for Stack: Total sum of affiliation fees in stack."""
         total_fee = sum(item.affiliation_fee for item in self._items)
         return f"Total Affiliation Fees Sum: ${total_fee:,.2f}"
 
-
+# clase para la implementación de una cola (queue) de afiliados
 class AffiliateQueue(BaseStructure):
-    """Queue implementation using collections.deque (FIFO)"""
-    
+    # implementación de una cola (queue) de afiliados
     def __init__(self):
         self._items: deque[Affiliate] = deque()
 
-    def add(self, affiliate: Affiliate) -> None:
-        self._items.append(affiliate)  # Enqueue
+    def add(self, affiliate: Affiliate) -> None: # agrega un afiliado a la cola (queue) de afiliados
+        self._items.append(affiliate) 
 
-    def remove(self, id_number: Optional[str] = None) -> Optional[Affiliate]:
+    def remove(self, id_number: Optional[str] = None) -> Optional[Affiliate]: # elimina un afiliado de la cola (queue) de afiliados
         if not self.is_empty():
-            return self._items.popleft()  # Dequeue FIFO
+            return self._items.popleft() # elimina el primer elemento de la cola (queue) de afiliados
         return None
 
-    def get_all(self) -> List[Affiliate]:
+    def get_all(self) -> List[Affiliate]: # devuelve todos los afiliados en la cola (queue) de afiliados
         return list(self._items)
 
-    def is_empty(self) -> bool:
+    def is_empty(self) -> bool: # verifica si la cola (queue) de afiliados está vacía
         return len(self._items) == 0
 
     def get_report(self) -> str:
-        """Report for Queue: Count of current records in queue."""
         return f"Total Enqueued Records: {len(self._items)}"
 
-
+# clase para la implementación de una lista (list) de afiliados
 class AffiliateList(BaseStructure):
-    """List implementation using Python list with search-and-delete capability"""
-    
+    # implementación de una lista (list) de afiliados
     def __init__(self):
         self._items: List[Affiliate] = []
 
-    def add(self, affiliate: Affiliate) -> None:
+    def add(self, affiliate: Affiliate) -> None: # agrega un afiliado a la lista (list) de afiliados
         self._items.append(affiliate)
 
-    def remove(self, id_number: Optional[str] = None) -> Optional[Affiliate]:
+    def remove(self, id_number: Optional[str] = None) -> Optional[Affiliate]: # elimina un afiliado de la lista (list) de afiliados
         if not id_number:
             return None
             
         for index, item in enumerate(self._items):
             if item.id_number == id_number:
-                return self._items.pop(index)
+                return self._items.pop(index) # elimina el afiliado de la lista (list) de afiliados por su número de identificación
         return None
 
-    def find_by_id(self, id_number: str) -> Optional[Affiliate]:
+    def find_by_id(self, id_number: str) -> Optional[Affiliate]: # busca un afiliado en la lista (list) de afiliados por su número de identificación
         for item in self._items:
-            if item.id_number == id_number:
+            if item.id_number == id_number: 
                 return item
         return None
 
@@ -108,8 +103,7 @@ class AffiliateList(BaseStructure):
     def is_empty(self) -> bool:
         return len(self._items) == 0
 
-    def get_report(self) -> str:
-        """Report for List: Average current income of members in list."""
+    def get_report(self) -> str: # devuelve un reporte de la lista (list) de afiliados
         if self.is_empty():
             return "Average Income: $0.00"
         avg_income = sum(item.current_income for item in self._items) / len(self._items)
