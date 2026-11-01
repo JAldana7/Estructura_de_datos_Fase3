@@ -1,25 +1,26 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
-from typing import Callable, Dict, Any, List
+from tkinter import ttk
+from typing import Callable, Dict, List
+from utils.helpers import centrar_ventana
 from models.enums import IDType, EmploymentType, DesiredService, StructureType
 
 class MainView(tk.Frame):
     """
-    Main Application Window View for Compensándote Affiliation Control.
-    Implements a dark theme layout with a left form panel and a right Treeview panel.
+    Modern UI implementation for Compensándote Affiliation Control.
+    Matches the custom corporate layout with cyan header banners and rounded panel designs.
     """
 
     def __init__(self, parent: tk.Tk):
         super().__init__(parent)
         self.parent = parent
-        self.parent.title("Caja Compensándote - Control de Afiliados")
-        self.parent.geometry("1100x680")
+        self.parent.title("Compensándote — Affiliation Control")
+        centrar_ventana(self.parent, 1150, 700)
+        #self.parent.geometry("1150x700")
         self.parent.resizable(True, True)
 
-        # Callbacks container for Controller bindings
         self.callbacks: Dict[str, Callable] = {}
 
-        # UI Control variables
+        # UI Variables
         self.var_id_type = tk.StringVar(value=IDType.CC.value)
         self.var_id_number = tk.StringVar()
         self.var_full_name = tk.StringVar()
@@ -28,198 +29,197 @@ class MainView(tk.Frame):
         self.var_desired_service = tk.StringVar(value=DesiredService.UNEMPLOYMENT_SUBSIDY.value)
         self.var_affiliation_fee = tk.StringVar(value="$0.00")
         
-        # Date variables
-        self.var_day = tk.StringVar(value="1")
-        self.var_month = tk.StringVar(value="1")
+        # Date selector variables
+        self.var_day = tk.StringVar(value="31")
+        self.var_month = tk.StringVar(value="10")
         self.var_year = tk.StringVar(value="2026")
 
-        # Structure selection and report variables
+        # Structure selection & Report variables
         self.var_selected_structure = tk.StringVar(value=StructureType.STACK.value)
-        self.var_report_text = tk.StringVar(value="Select a structure and click Report")
+        self.var_report_text = tk.StringVar(value="Total Affiliation Fees Sum: $0.00")
 
-        # Set theme styles and build layout
-        self._configure_styles()
+        self._configure_modern_palette()
         self._create_menu_bar()
+
+        # ---> AGREGAR ESTA LÍNEA PARA EMPAQUETAR EL FRAME PRINCIPAL <---
+        self.pack(fill=tk.BOTH, expand=True)
+
         self._build_ui()
 
-    def _configure_styles(self) -> None:
-        """Configures custom dark blue styles matching the reference design."""
-        self.bg_dark = "#0F172A"       # Main background (slate dark)
-        self.bg_card = "#1E293B"       # Panel background
-        self.fg_light = "#F8FAFC"      # Primary text color
-        self.accent_cyan = "#06B6D4"    # Primary action color
-        self.accent_red = "#EF4444"     # Danger / Exit action color
-        self.accent_orange = "#F97316"  # Secondary action color
+    def _configure_modern_palette(self) -> None:
+        """Sets corporate palette based on reference UI image."""
+        self.bg_window = "#F1F5F9"        # Soft slate grey background
+        self.bg_card = "#FFFFFF"          # White container cards
+        self.border_gray = "#CBD5E1"      # Border lines
+        self.fg_dark = "#1E293B"          # Text color
+        self.fg_label = "#334155"         # Field label text color
+        
+        # Exact palette colors from mockup
+        self.cyan_header = "#00B4D8"       # Top header cyan banner
+        self.cyan_accent = "#00B4D8"       # Form title & highlights
+        self.bg_fee_box = "#E0F2FE"       # Light blue highlight box
+        
+        # Button Palette
+        self.btn_register = "#00B4D8"     # Bright Cyan
+        self.btn_clear = "#78869B"        # Slate Muted Blue
+        self.btn_report = "#00B67A"       # Emerald Mint Green
+        self.btn_delete = "#F97316"       # Vivid Orange
+        self.btn_exit = "#EF4444"         # Crimson Red
 
-        self.parent.configure(bg=self.bg_dark)
-        self.configure(bg=self.bg_dark)
+        self.parent.configure(bg=self.bg_window)
+        self.configure(bg=self.bg_window)
 
+        # Style TTK widgets
         style = ttk.Style()
         style.theme_use("clam")
 
-        # Treeview styling
+        # Table styling (Light pastel headers matching image)
         style.configure(
             "Treeview",
-            background="#1E293B",
-            foreground="#F8FAFC",
-            fieldbackground="#1E293B",
-            rowheight=25,
-            bordercolor="#334155"
+            background="#FFFFFF",
+            foreground="#1E293B",
+            fieldbackground="#FFFFFF",
+            rowheight=28,
+            bordercolor="#E2E8F0",
+            font=("Segoe UI", 9)
         )
         style.configure(
             "Treeview.Heading",
-            background="#0F172A",
-            foreground="#06B6D4",
-            font=("Consolas", 10, "bold")
+            background="#E0F2FE",
+            foreground="#0284C7",
+            relief="flat",
+            font=("Segoe UI", 9, "bold")
         )
-        style.map("Treeview", background=[("selected", "#0284C7")])
+        style.map("Treeview", background=[("selected", "#BAE6FD")], foreground=[("selected", "#0369A1")])
 
     def _create_menu_bar(self) -> None:
-        """Creates top menu bar with 'About' option."""
         menubar = tk.Menu(self.parent)
         about_menu = tk.Menu(menubar, tearoff=0)
-        about_menu.add_command(
-            label="About...", 
-            command=lambda: self._trigger_callback("on_about")
-        )
+        about_menu.add_command(label="About...", command=lambda: self._trigger_callback("on_about"))
         menubar.add_cascade(label="About", menu=about_menu)
         self.parent.config(menu=menubar)
 
     def _build_ui(self) -> None:
-        """Constructs main 2-column layout."""
-        self.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        # Top Cyan Banner
+        header_banner = tk.Frame(self, bg=self.cyan_header, height=50)
+        header_banner.pack(fill=tk.X, side=tk.TOP)
 
-        # Header Title Banner
-        header_frame = tk.Frame(self, bg=self.bg_dark)
-        header_frame.pack(fill=tk.X, pady=(0, 10))
+        title_container = tk.Frame(header_banner, bg=self.cyan_header)
+        title_container.pack(side=tk.LEFT, padx=15, pady=10)
 
-        title_label = tk.Label(
+        # Building icon placeholder text & main title
+        tk.Label(
+            title_container,
+            text="🏢  Compensándote — Affiliation Control",
+            font=("Segoe UI", 15, "bold"),
+            fg="white",
+            bg=self.cyan_header
+        ).pack(side=tk.LEFT)
+
+        # Main Layout Body
+        body_container = tk.Frame(self, bg=self.bg_window)
+        body_container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+
+        self._build_left_form_card(body_container)
+        self._build_right_grid_card(body_container)
+
+    def _build_left_form_card(self, parent: tk.Widget) -> None:
+        """Builds left column matching the blue-header rounded card design."""
+        form_wrapper = tk.Frame(parent, bg=self.bg_card, bd=1, relief=tk.SOLID)
+        form_wrapper.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 15), ipadx=0, ipady=0)
+
+        # Card Cyan Header
+        header_frame = tk.Frame(form_wrapper, bg=self.btn_register, height=40)
+        header_frame.pack(fill=tk.X)
+
+        tk.Label(
             header_frame,
-            text="Compensándote — Affiliation Control",
-            font=("Segoe UI", 16, "bold"),
-            fg=self.accent_cyan,
-            bg=self.bg_dark
-        )
-        title_label.pack(side=tk.LEFT)
+            text="👥   Member Registration Data",
+            font=("Segoe UI", 10, "bold"),
+            fg="white",
+            bg=self.btn_register
+        ).pack(side=tk.LEFT, padx=12, pady=8)
 
-        # Main Split Container
-        main_container = tk.Frame(self, bg=self.bg_dark)
-        main_container.pack(fill=tk.BOTH, expand=True)
-
-        # Left Column: Data Input Form
-        self._build_form_panel(main_container)
-
-        # Right Column: Data View & Control Panel
-        self._build_display_panel(main_container)
-
-    def _build_form_panel(self, parent: tk.Widget) -> None:
-        """Builds left input controls panel."""
-        form_frame = tk.LabelFrame(
-            parent,
-            text=" Member Registration Data ",
-            font=("Segoe UI", 11, "bold"),
-            fg=self.accent_cyan,
-            bg=self.bg_card,
-            bd=1,
-            relief=tk.SOLID
-        )
-        form_frame.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 10), ipadx=10, ipady=10)
+        # Form Content Area
+        form_body = tk.Frame(form_wrapper, bg=self.bg_card, padx=12, pady=10)
+        form_body.pack(fill=tk.BOTH, expand=True)
 
         # ID Type
-        tk.Label(form_frame, text="ID Type:", fg=self.fg_light, bg=self.bg_card, anchor="w").pack(fill=tk.X, pady=(5, 2))
-        cb_id_type = ttk.Combobox(
-            form_frame, 
-            textvariable=self.var_id_type, 
-            values=[e.value for e in IDType], 
-            state="readonly"
-        )
+        tk.Label(form_body, text="ID Type:", fg=self.fg_label, bg=self.bg_card, anchor="w", font=("Segoe UI", 9)).pack(fill=tk.X, pady=(2, 2))
+        cb_id_type = ttk.Combobox(form_body, textvariable=self.var_id_type, values=[e.value for e in IDType], state="readonly")
         cb_id_type.pack(fill=tk.X, pady=(0, 8))
 
         # ID Number
-        tk.Label(form_frame, text="ID Number (digits only):", fg=self.fg_light, bg=self.bg_card, anchor="w").pack(fill=tk.X, pady=(2, 2))
-        entry_id = tk.Entry(form_frame, textvariable=self.var_id_number, bg="#334155", fg=self.fg_light, insertbackground="white")
+        tk.Label(form_body, text="ID Number (digits only):", fg=self.fg_label, bg=self.bg_card, anchor="w", font=("Segoe UI", 9)).pack(fill=tk.X, pady=(2, 2))
+        entry_id = tk.Entry(form_body, textvariable=self.var_id_number, bg="#FFFFFF", fg=self.fg_dark, bd=1, relief=tk.SOLID)
         entry_id.pack(fill=tk.X, pady=(0, 8))
 
         # Full Name
-        tk.Label(form_frame, text="Full Name (letters only):", fg=self.fg_light, bg=self.bg_card, anchor="w").pack(fill=tk.X, pady=(2, 2))
-        entry_name = tk.Entry(form_frame, textvariable=self.var_full_name, bg="#334155", fg=self.fg_light, insertbackground="white")
+        tk.Label(form_body, text="Full Name (letters only):", fg=self.fg_label, bg=self.bg_card, anchor="w", font=("Segoe UI", 9)).pack(fill=tk.X, pady=(2, 2))
+        entry_name = tk.Entry(form_body, textvariable=self.var_full_name, bg="#FFFFFF", fg=self.fg_dark, bd=1, relief=tk.SOLID)
         entry_name.pack(fill=tk.X, pady=(0, 8))
 
         # Current Income
-        tk.Label(form_frame, text="Current Monthly Income ($):", fg=self.fg_light, bg=self.bg_card, anchor="w").pack(fill=tk.X, pady=(2, 2))
-        entry_income = tk.Entry(form_frame, textvariable=self.var_current_income, bg="#334155", fg=self.fg_light, insertbackground="white")
+        tk.Label(form_body, text="Current Monthly Income ($):", fg=self.fg_label, bg=self.bg_card, anchor="w", font=("Segoe UI", 9)).pack(fill=tk.X, pady=(2, 2))
+        entry_income = tk.Entry(form_body, textvariable=self.var_current_income, bg="#FFFFFF", fg=self.fg_dark, bd=1, relief=tk.SOLID)
         entry_income.pack(fill=tk.X, pady=(0, 8))
         entry_income.bind("<KeyRelease>", lambda e: self._trigger_callback("on_recalculate_fee"))
 
-        # Employment Type (Radio buttons)
-        tk.Label(form_frame, text="Employment Type:", fg=self.fg_light, bg=self.bg_card, anchor="w").pack(fill=tk.X, pady=(2, 2))
-        emp_frame = tk.Frame(form_frame, bg=self.bg_card)
+        # Employment Type (Radio Buttons)
+        tk.Label(form_body, text="Employment Type:", fg=self.fg_label, bg=self.bg_card, anchor="w", font=("Segoe UI", 9, "bold")).pack(fill=tk.X, pady=(2, 2))
+        emp_frame = tk.Frame(form_body, bg=self.bg_card)
         emp_frame.pack(fill=tk.X, pady=(0, 8))
         for emp in EmploymentType:
             rb = tk.Radiobutton(
-                emp_frame,
-                text=emp.value,
-                value=emp.value,
-                variable=self.var_employment_type,
-                fg=self.fg_light,
-                bg=self.bg_card,
-                selectcolor=self.bg_dark,
-                activebackground=self.bg_card,
-                activeforeground=self.accent_cyan,
+                emp_frame, text=emp.value, value=emp.value, variable=self.var_employment_type,
+                fg=self.fg_dark, bg=self.bg_card, activebackground=self.bg_card,
                 command=lambda: self._trigger_callback("on_recalculate_fee")
             )
-            rb.pack(side=tk.LEFT, padx=5)
+            rb.pack(side=tk.LEFT, padx=(0, 10))
 
         # Desired Service
-        tk.Label(form_frame, text="Desired Service:", fg=self.fg_light, bg=self.bg_card, anchor="w").pack(fill=tk.X, pady=(2, 2))
-        cb_service = ttk.Combobox(
-            form_frame, 
-            textvariable=self.var_desired_service, 
-            values=[s.value for s in DesiredService], 
-            state="readonly"
-        )
+        tk.Label(form_body, text="Desired Service:", fg=self.fg_label, bg=self.bg_card, anchor="w", font=("Segoe UI", 9)).pack(fill=tk.X, pady=(2, 2))
+        cb_service = ttk.Combobox(form_body, textvariable=self.var_desired_service, values=[s.value for s in DesiredService], state="readonly")
         cb_service.pack(fill=tk.X, pady=(0, 8))
         cb_service.bind("<<ComboboxSelected>>", lambda e: self._trigger_callback("on_recalculate_fee"))
 
-        # Calculated Fee (Read-only)
-        tk.Label(form_frame, text="Calculated Affiliation Fee:", fg=self.fg_light, bg=self.bg_card, anchor="w").pack(fill=tk.X, pady=(2, 2))
-        entry_fee = tk.Entry(form_frame, textvariable=self.var_affiliation_fee, state="readonly", bg="#1E293B", fg=self.accent_cyan, font=("Segoe UI", 10, "bold"))
+        # Calculated Fee (Read-only Blue Highlight)
+        tk.Label(form_body, text="Calculated Affiliation Fee:", fg=self.fg_label, bg=self.bg_card, anchor="w", font=("Segoe UI", 9)).pack(fill=tk.X, pady=(2, 2))
+        entry_fee = tk.Entry(
+            form_body, textvariable=self.var_affiliation_fee, state="readonly", 
+            bg=self.bg_fee_box, fg=self.cyan_accent, font=("Segoe UI", 10, "bold"), 
+            bd=1, relief=tk.SOLID
+        )
         entry_fee.pack(fill=tk.X, pady=(0, 8))
 
-        # Affiliation Date (Spinboxes)
-        tk.Label(form_frame, text="Affiliation Date (dd/mm/yyyy):", fg=self.fg_light, bg=self.bg_card, anchor="w").pack(fill=tk.X, pady=(2, 2))
-        date_frame = tk.Frame(form_frame, bg=self.bg_card)
-        date_frame.pack(fill=tk.X, pady=(0, 8))
+        # Affiliation Date
+        tk.Label(form_body, text="Affiliation Date (dd/mm/yyyy):", fg=self.fg_label, bg=self.bg_card, anchor="w", font=("Segoe UI", 9)).pack(fill=tk.X, pady=(2, 2))
+        date_frame = tk.Frame(form_body, bg=self.bg_card)
+        date_frame.pack(fill=tk.X, pady=(0, 4))
 
-        tk.Spinbox(date_frame, from_=1, to=31, textvariable=self.var_day, width=4).pack(side=tk.LEFT, padx=2)
-        tk.Label(date_frame, text="/", fg=self.fg_light, bg=self.bg_card).pack(side=tk.LEFT)
-        tk.Spinbox(date_frame, from_=1, to=12, textvariable=self.var_month, width=4).pack(side=tk.LEFT, padx=2)
-        tk.Label(date_frame, text="/", fg=self.fg_light, bg=self.bg_card).pack(side=tk.LEFT)
-        tk.Spinbox(date_frame, from_=2020, to=2030, textvariable=self.var_year, width=6).pack(side=tk.LEFT, padx=2)
+        ttk.Combobox(date_frame, textvariable=self.var_day, values=[str(i) for i in range(1, 32)], width=3, state="readonly").pack(side=tk.LEFT, padx=1)
+        tk.Label(date_frame, text="/", fg=self.fg_dark, bg=self.bg_card).pack(side=tk.LEFT)
+        ttk.Combobox(date_frame, textvariable=self.var_month, values=[str(i) for i in range(1, 13)], width=3, state="readonly").pack(side=tk.LEFT, padx=1)
+        tk.Label(date_frame, text="/", fg=self.fg_dark, bg=self.bg_card).pack(side=tk.LEFT)
+        ttk.Combobox(date_frame, textvariable=self.var_year, values=[str(i) for i in range(2020, 2031)], width=5, state="readonly").pack(side=tk.LEFT, padx=1)
 
-    def _build_display_panel(self, parent: tk.Widget) -> None:
-        """Builds right display panel with Treeview, report field, and action buttons."""
-        display_frame = tk.Frame(parent, bg=self.bg_dark)
+    def _build_right_grid_card(self, parent: tk.Widget) -> None:
+        """Builds right display card with data structure dropdown, table, report, and modern action buttons."""
+        display_frame = tk.Frame(parent, bg=self.bg_window)
         display_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
 
         # Structure Selector Toolbar
-        toolbar = tk.Frame(display_frame, bg=self.bg_dark)
-        toolbar.pack(fill=tk.X, pady=(0, 8))
+        toolbar = tk.Frame(display_frame, bg=self.bg_window)
+        toolbar.pack(fill=tk.X, pady=(0, 10))
 
-        tk.Label(toolbar, text="View Data Structure:", fg=self.fg_light, bg=self.bg_dark, font=("Segoe UI", 10, "bold")).pack(side=tk.LEFT, padx=(0, 10))
-        cb_structure = ttk.Combobox(
-            toolbar,
-            textvariable=self.var_selected_structure,
-            values=[s.value for s in StructureType],
-            state="readonly",
-            width=15
-        )
+        tk.Label(toolbar, text="View Data Structure:", fg=self.fg_dark, bg=self.bg_window, font=("Segoe UI", 10, "bold")).pack(side=tk.LEFT, padx=(0, 10))
+        cb_structure = ttk.Combobox(toolbar, textvariable=self.var_selected_structure, values=[s.value for s in StructureType], state="readonly", width=18)
         cb_structure.pack(side=tk.LEFT)
         cb_structure.bind("<<ComboboxSelected>>", lambda e: self._trigger_callback("on_structure_changed"))
 
         # Treeview Container
-        tree_frame = tk.Frame(display_frame, bg=self.bg_dark)
-        tree_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        tree_frame = tk.Frame(display_frame, bg=self.bg_card, bd=1, relief=tk.SOLID)
+        tree_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 12))
 
         columns = ("id_type", "id_number", "full_name", "income", "employment", "service", "fee", "date")
         self.tree = ttk.Treeview(tree_frame, columns=columns, show="headings", selectmode="browse")
@@ -233,13 +233,13 @@ class MainView(tk.Frame):
         self.tree.heading("fee", text="Fee")
         self.tree.heading("date", text="Date")
 
-        self.tree.column("id_type", width=50, anchor="center")
-        self.tree.column("id_number", width=90, anchor="center")
+        self.tree.column("id_type", width=55, anchor="center")
+        self.tree.column("id_number", width=95, anchor="center")
         self.tree.column("full_name", width=140, anchor="w")
-        self.tree.column("income", width=90, anchor="e")
-        self.tree.column("employment", width=90, anchor="center")
+        self.tree.column("income", width=85, anchor="e")
+        self.tree.column("employment", width=95, anchor="center")
         self.tree.column("service", width=130, anchor="w")
-        self.tree.column("fee", width=80, anchor="e")
+        self.tree.column("fee", width=85, anchor="e")
         self.tree.column("date", width=80, anchor="center")
 
         scrollbar = ttk.Scrollbar(tree_frame, orient=tk.VERTICAL, command=self.tree.yview)
@@ -248,73 +248,42 @@ class MainView(tk.Frame):
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-        # Non-editable Report Field
-        report_frame = tk.Frame(display_frame, bg=self.bg_dark)
-        report_frame.pack(fill=tk.X, pady=(0, 10))
+        # Report Row Bar
+        report_frame = tk.Frame(display_frame, bg=self.bg_window)
+        report_frame.pack(fill=tk.X, pady=(0, 12))
 
-        tk.Label(report_frame, text="Report:", fg=self.fg_light, bg=self.bg_dark, font=("Segoe UI", 10, "bold")).pack(side=tk.LEFT, padx=(0, 10))
+        tk.Label(report_frame, text="Report:", fg=self.fg_dark, bg=self.bg_window, font=("Segoe UI", 10, "bold")).pack(side=tk.LEFT, padx=(0, 10))
         entry_report = tk.Entry(
-            report_frame, 
-            textvariable=self.var_report_text, 
-            state="readonly", 
-            bg="#1E293B", 
-            fg=self.accent_cyan, 
-            font=("Segoe UI", 10, "bold")
+            report_frame, textvariable=self.var_report_text, state="readonly", 
+            bg=self.bg_fee_box, fg=self.cyan_accent, font=("Segoe UI", 10, "bold"), 
+            bd=1, relief=tk.SOLID
         )
         entry_report.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
-        # Action Buttons Panel
-        btn_frame = tk.Frame(display_frame, bg=self.bg_dark)
+        # Action Pill Buttons Panel
+        btn_frame = tk.Frame(display_frame, bg=self.bg_window)
         btn_frame.pack(fill=tk.X)
 
-        btn_register = tk.Button(
-            btn_frame, text="Register", bg=self.accent_cyan, fg="black", font=("Segoe UI", 9, "bold"),
-            command=lambda: self._trigger_callback("on_register")
-        )
-        btn_register.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
-
-        btn_clear = tk.Button(
-            btn_frame, text="Clear", bg="#64748B", fg="white", font=("Segoe UI", 9, "bold"),
-            command=lambda: self._trigger_callback("on_clear")
-        )
-        btn_clear.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
-
-        btn_report = tk.Button(
-            btn_frame, text="Report", bg="#10B981", fg="black", font=("Segoe UI", 9, "bold"),
-            command=lambda: self._trigger_callback("on_report")
-        )
-        btn_report.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
-
-        btn_delete = tk.Button(
-            btn_frame, text="Delete", bg=self.accent_orange, fg="white", font=("Segoe UI", 9, "bold"),
-            command=lambda: self._trigger_callback("on_delete")
-        )
-        btn_delete.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
-
-        btn_exit = tk.Button(
-            btn_frame, text="Exit", bg=self.accent_red, fg="white", font=("Segoe UI", 9, "bold"),
-            command=lambda: self._trigger_callback("on_exit")
-        )
-        btn_exit.pack(side=tk.LEFT, expand=True, fill=tk.X, padx=2)
+        tk.Button(btn_frame, text="👤+ Register", bg=self.btn_register, fg="white", font=("Segoe UI", 9, "bold"), bd=0, relief=tk.FLAT, command=lambda: self._trigger_callback("on_register")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=3, ipady=5)
+        tk.Button(btn_frame, text="✏️ Clear", bg=self.btn_clear, fg="white", font=("Segoe UI", 9, "bold"), bd=0, relief=tk.FLAT, command=lambda: self._trigger_callback("on_clear")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=3, ipady=5)
+        tk.Button(btn_frame, text="📑 Report", bg=self.btn_report, fg="white", font=("Segoe UI", 9, "bold"), bd=0, relief=tk.FLAT, command=lambda: self._trigger_callback("on_report")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=3, ipady=5)
+        tk.Button(btn_frame, text="🗑️ Delete", bg=self.btn_delete, fg="white", font=("Segoe UI", 9, "bold"), bd=0, relief=tk.FLAT, command=lambda: self._trigger_callback("on_delete")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=3, ipady=5)
+        tk.Button(btn_frame, text="🚪 Exit", bg=self.btn_exit, fg="white", font=("Segoe UI", 9, "bold"), bd=0, relief=tk.FLAT, command=lambda: self._trigger_callback("on_exit")).pack(side=tk.LEFT, expand=True, fill=tk.X, padx=3, ipady=5)
 
     def set_controller_callbacks(self, callbacks: Dict[str, Callable]) -> None:
-        """Binds controller event handler methods to view events."""
         self.callbacks = callbacks
 
     def _trigger_callback(self, key: str) -> None:
-        """Helper to invoke controller callback if registered."""
         if key in self.callbacks:
             self.callbacks[key]()
 
     def update_treeview(self, data: List[tuple]) -> None:
-        """Refreshes Treeview rows with provided list of tuples."""
         for item in self.tree.get_children():
             self.tree.delete(item)
         for row in data:
             self.tree.insert("", tk.END, values=row)
 
     def clear_inputs(self) -> None:
-        """Resets all input fields without clearing Treeview data."""
         self.var_id_number.set("")
         self.var_full_name.set("")
         self.var_current_income.set("")

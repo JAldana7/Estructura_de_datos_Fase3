@@ -18,11 +18,11 @@ class LoginView(tk.Tk):
             ctypes.windll.shcore.SetProcessDpiAwareness(1) # Mejorar la resolución
         except:
             pass
-        super().__init__() #hereda comportamients
+        super().__init__() #hereda comportamientos
 
         self.controller = controller # Asigna el controlador
 
-        # Configuración de la ventana principal y 
+        # Configuración de la ventana principal
         self.title("Login - Compensándote")
 
         # Obtener la carpeta principal del proyecto
@@ -59,6 +59,7 @@ class LoginView(tk.Tk):
 
         # Colores personalizados
         self.COLOR_AZUL = "#00B4D8"
+        self.COLOR_ROJO = "#DC2626"
         self.COLOR_FONDO = "#F4F6F8"
 
         # Configuración de estilos para los widgets
@@ -66,13 +67,23 @@ class LoginView(tk.Tk):
         self.style.configure("Card.TFrame", background="#FFFFFF")
         self.style.configure("Header.TFrame", background=self.COLOR_AZUL)
 
-        # Estilo para el botón principal de ingreso
-        self.style.configure("Login.TButton", 
-                             font=("Segoe UI", 10, "bold"), 
-                             background=self.COLOR_AZUL
-                             , 
-                             foreground="#FFFFFF")
-        self.style.map("Login.TButton", background=[("active", "#0B3B2D")])
+        # Estilo para el botón principal de ingreso (Cian)
+        self.style.configure(
+            "Login.TButton", 
+            font=("Segoe UI", 10, "bold"), 
+            background=self.COLOR_AZUL, 
+            foreground="#FFFFFF"
+        )
+        self.style.map("Login.TButton", background=[("active", "#0284C7")])
+
+        # Estilo para el botón de salida (Rojo)
+        self.style.configure(
+            "Exit.TButton", 
+            font=("Segoe UI", 10, "bold"), 
+            background=self.COLOR_ROJO, 
+            foreground="#FFFFFF"
+        )
+        self.style.map("Exit.TButton", background=[("active", "#B91C1C")])
 
     #funcion para crear la interfaz de usuario
     def _crear_interfaz(self):
@@ -193,13 +204,26 @@ class LoginView(tk.Tk):
         )
         self.btn_toggle_eye.pack(side="right", padx=10)
 
+        # Contenedor de Botones de Acción (Ingresar y Salir al lado)
+        action_buttons_frame = tk.Frame(card_frame, bg="#FFFFFF")
+        action_buttons_frame.pack(fill="x", pady=(5, 0))
+
         # Botón Ingresar
         self.btn_ingresar = ttk.Button(
-            card_frame, 
-            text="➔   Enter the system   ➔", 
+            action_buttons_frame, 
+            text="➔   Login", 
             style="Login.TButton"
         )
-        self.btn_ingresar.pack(fill="x", ipady=8, pady=(5, 0))
+        self.btn_ingresar.pack(side="left", fill="x", expand=True, ipady=8, padx=(0, 5))
+
+        # Botón Salir
+        self.btn_salir = ttk.Button(
+            action_buttons_frame, 
+            text="🚪   Exit", 
+            style="Exit.TButton",
+            command=self._confirmar_salida
+        )
+        self.btn_salir.pack(side="right", fill="x", expand=True, ipady=8, padx=(5, 0))
 
         # Footer
         footer_frame = tk.Frame(self, bg=self.COLOR_FONDO)
@@ -236,10 +260,20 @@ class LoginView(tk.Tk):
 
     #funcion para alternar la visibilidad de la contraseña
     def _toggle_password_visibility(self):
-        #Alterna entre ocultar y mostrar el texto de la contraseña.
         if self._password_visible:
             self.txt_password.config(show="*")
             self._password_visible = False
         else:
             self.txt_password.config(show="")
             self._password_visible = True
+
+    #funcion para confirmar y cerrar la aplicacion
+    def _confirmar_salida(self):
+        respuesta = messagebox.askyesno(
+            "Exit Application", 
+            "Are you sure you want to exit the system?", 
+            parent=self
+        )
+        if respuesta:
+            self.destroy()
+            sys.exit(0)
